@@ -33,5 +33,6 @@ public class Department {
     private String creationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd hh:mm:ss"));
 
     @Column(nullable = false, name = "modification_date")
-    private String modificationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd hh:mm:ss"));
+//    private String modificationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd hh:mm:ss"));
+    private String modificationDate = null;
 }

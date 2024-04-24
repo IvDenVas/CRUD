@@ -19,47 +19,19 @@ public class DepartmentsServiceImplement implements DepartmentsService {
         return  repo.findById(id).get();
     }
 
-//    @Override
-//    public void save(Department department) {
-//        if (department.getId() == null) {
-//            dao.save(department);
-//        } else {
-//            dao.updateDepartmentById(department.getAddress(), department.getId());
-//        }
-//    }
-
     @Override
     public void save(Department department) {
         if(department.getId() == null) repo.save(department);
         else {
-            repo.updateDepartmentById(department.getName(), department.getAddress(), department.getModificationDate(), department.getId());
+            department.setModificationDate(LocalDateTime.now().format(DateTimeFormatter
+                    .ofPattern("yy-MM-dd hh:mm:ss")));
+            repo.updateDepartmentById(department.getName(), department.getAddress(), department.getModificationDate(),
+                    department.getId());
         }
     }
-
-//    public Department save2(Department department) {
-//        if (department.getId() == null) {
-//            dao.save(department);
-//        } else {
-//            // Проверка существования записи с переданным id
-//            if (!departmentService.existsById(department.getId())) {
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            }
-//            department.setModificationDate(new Date());
-//        }
-//
-//        Department savedDepartment = departmentService.saveOrUpdateDepartment(department);
-//        return new ResponseEntity<>(savedDepartment, HttpStatus.OK);
-//        return dao.save(department);
-//    }
-
 
     @Override
     public void deleteDepartmentByID(Long id) {
         repo.deleteById(id);
     }
-
-//    @Override
-//    public Long getMaxId() {
-//        return dao.getMaxID().get().getId();
-//    }
 }
