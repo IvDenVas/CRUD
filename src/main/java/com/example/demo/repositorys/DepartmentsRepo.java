@@ -14,8 +14,8 @@ public interface DepartmentsRepo extends JpaRepository<Department, Long> {
 //    @Query("select m from Department m where m.id = (select max(id) from Department)")
 //    Optional<Department> getMaxID();
 
-//    @Modifying
-////    @Transactional
-//    @Query("UPDATE Department SET address = :address WHERE id = :id")
-//    void updateDepartmentById(String address, long id);
+    @Modifying
+    @Transactional
+    @Query("UPDATE Department SET name = :name,address = :address, modificationDate = :modificationDate WHERE id = :id")
+    void updateDepartmentById(String name,String address,String modificationDate, long id);
 }

@@ -6,6 +6,9 @@ import com.example.demo.service.DepartmentsService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Service
 @AllArgsConstructor
 public class DepartmentsServiceImplement implements DepartmentsService {
@@ -26,8 +29,11 @@ public class DepartmentsServiceImplement implements DepartmentsService {
 //    }
 
     @Override
-    public Department save(Department department) {
-        return repo.save(department);
+    public void save(Department department) {
+        if(department.getId() == null) repo.save(department);
+        else {
+            repo.updateDepartmentById(department.getName(), department.getAddress(), department.getModificationDate(), department.getId());
+        }
     }
 
 //    public Department save2(Department department) {

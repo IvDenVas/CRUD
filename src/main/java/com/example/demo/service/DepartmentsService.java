@@ -5,7 +5,7 @@ import com.example.demo.model.Department;
 
 public interface DepartmentsService {
     Department getDepartmentById(Long id);
-    Department save(Department department);
+    void save(Department department);
     void deleteDepartmentByID(Long id);
 //    Long getMaxId();
 }

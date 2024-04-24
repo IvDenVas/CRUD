@@ -20,8 +20,8 @@ public class DepartmentsController {
     }
     @PostMapping("save/")
     public ResponseEntity<Department> addNewDepartment(Department department){
-//        departmentsServiceImplement.save(department);
-        return new ResponseEntity<>(departmentsServiceImplement.save(department),HttpStatus.CREATED);
+        departmentsServiceImplement.save(department);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("delete/{id}")
