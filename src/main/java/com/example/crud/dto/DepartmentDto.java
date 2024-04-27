@@ -1,12 +1,10 @@
 package com.example.crud.dto;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
 public class DepartmentDto {
 
     private Long id;
