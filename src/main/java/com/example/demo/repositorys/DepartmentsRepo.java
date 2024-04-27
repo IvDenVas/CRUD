@@ -7,15 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Repository
 public interface DepartmentsRepo extends JpaRepository<Department, Long> {
-//    @Query("select m from Department m where m.id = (select max(id) from Department)")
-//    Optional<Department> getMaxID();
 
     @Modifying
     @Transactional
     @Query("UPDATE Department SET name = :name,address = :address, modificationDate = :modificationDate WHERE id = :id")
-    void updateDepartmentById(String name,String address,String modificationDate, long id);
+    void updateDepartmentById(String name, String address, LocalDateTime modificationDate, long id);
 }

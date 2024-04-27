@@ -1,14 +1,11 @@
 package com.example.demo.model;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Data
 @AllArgsConstructor
@@ -17,9 +14,6 @@ import java.time.format.DateTimeFormatter;
 @Table(name = "department")
 public class Department {
     @Id
-//    @Column(name = "id")
-//    @SequenceGenerator(name = "departmentsIdSeq",sequenceName = "department_id_seq", allocationSize = 1)
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "departmentsIdSeq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -30,9 +24,8 @@ public class Department {
     private String address;
 
     @Column(nullable = false, name = "creation_date")
-    private String creationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd hh:mm:ss"));
+    private LocalDateTime creationDate = LocalDateTime.now();
 
-    @Column(nullable = false, name = "modification_date")
-//    private String modificationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd hh:mm:ss"));
-    private String modificationDate = null;
+    @Column(nullable = true, name = "modification_date")
+    private LocalDateTime modificationDate = null;
 }
