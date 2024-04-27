@@ -1,6 +1,6 @@
-package com.example.demo.service;
+package com.example.crud.service;
 
-import com.example.demo.dto.DepartmentDto;
+import com.example.crud.dto.DepartmentDto;
 
 public interface DepartmentsService {
     DepartmentDto getDepartmentById(Long id);

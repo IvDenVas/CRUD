@@ -1,8 +1,8 @@
-package com.example.demo.controllers;
+package com.example.crud.controllers;
 
-import com.example.demo.dto.DepartmentDto;
-import com.example.demo.exception.ErrorMessage;
-import com.example.demo.service.implement.DepartmentsServiceImplement;
+import com.example.crud.dto.DepartmentDto;
+import com.example.crud.exception.ErrorMessage;
+import com.example.crud.service.implement.DepartmentsServiceImplement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +25,12 @@ public class DepartmentsController {
     }
 
     @DeleteMapping("delete/{id}")
-    public void deleteDepartment(@PathVariable Long id){
+    public ResponseEntity<String> deleteDepartment(@PathVariable Long id){
         departmentsServiceImplement.deleteDepartmentByID(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorMessage> handleException(RuntimeException exception) {
+    public ResponseEntity<ErrorMessage> getException(RuntimeException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessage(exception.getMessage()));

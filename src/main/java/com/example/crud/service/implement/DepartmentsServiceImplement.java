@@ -1,9 +1,9 @@
-package com.example.demo.service.implement;
+package com.example.crud.service.implement;
 
-import com.example.demo.dto.DepartmentDto;
-import com.example.demo.repositorys.DepartmentsRepo;
-import com.example.demo.model.Department;
-import com.example.demo.service.DepartmentsService;
+import com.example.crud.dto.DepartmentDto;
+import com.example.crud.repositories.DepartmentsRepo;
+import com.example.crud.model.Department;
+import com.example.crud.service.DepartmentsService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

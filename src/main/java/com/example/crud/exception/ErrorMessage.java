@@ -1,4 +1,4 @@
-package com.example.demo.exception;
+package com.example.crud.exception;
 
 
 import lombok.AllArgsConstructor;

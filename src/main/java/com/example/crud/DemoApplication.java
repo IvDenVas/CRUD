@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.crud;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;

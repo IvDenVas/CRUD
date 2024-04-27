@@ -1,6 +1,6 @@
-package com.example.demo.repositorys;
+package com.example.crud.repositories;
 
-import com.example.demo.model.Department;
+import com.example.crud.model.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
