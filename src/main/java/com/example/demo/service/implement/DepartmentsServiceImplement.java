@@ -1,7 +1,6 @@
 package com.example.demo.service.implement;
 
 import com.example.demo.dto.DepartmentDto;
-import com.example.demo.exception.NotFoundException;
 import com.example.demo.repositorys.DepartmentsRepo;
 import com.example.demo.model.Department;
 import com.example.demo.service.DepartmentsService;
@@ -19,7 +18,8 @@ public class DepartmentsServiceImplement implements DepartmentsService {
 
     @Override
     public DepartmentDto getDepartmentById(Long id) {
-        Department department = repo.findById(id).get();
+        Department department = repo.findById(id).orElseThrow(() -> new RuntimeException("Department " +
+                "с таким ID нет в базе данных!"));
         return mapper.map(department, DepartmentDto.class);
     }
 
@@ -30,11 +30,11 @@ public class DepartmentsServiceImplement implements DepartmentsService {
             repo.save(department);
         } else {
             findByIdOrElseThrow(dto.getId());
-                department.setModificationDate(LocalDateTime.now());
-                repo.updateDepartmentById(department.getName(),
-                        department.getAddress(),
-                        department.getModificationDate(),
-                        department.getId());
+            department.setModificationDate(LocalDateTime.now());
+            repo.updateDepartmentById(department.getName(),
+                    department.getAddress(),
+                    department.getModificationDate(),
+                    department.getId());
         }
     }
 
@@ -43,7 +43,8 @@ public class DepartmentsServiceImplement implements DepartmentsService {
         repo.deleteById(id);
     }
 
-    public Department findByIdOrElseThrow(Long id) {
-        return repo.findById(id).orElseThrow(() -> new RuntimeException("Department с таким ID нет в базе данных!"));
+    public void findByIdOrElseThrow(Long id) {
+        repo.findById(id).orElseThrow(() -> new RuntimeException("Department " +
+                "с таким ID нет в базе данных! Введите правильный id!"));
     }
 }

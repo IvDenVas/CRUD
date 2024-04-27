@@ -2,13 +2,11 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.DepartmentDto;
 import com.example.demo.exception.ErrorMessage;
-import com.example.demo.exception.NotFoundException;
 import com.example.demo.service.implement.DepartmentsServiceImplement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestController
 @RequestMapping("/")
