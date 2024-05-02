@@ -8,7 +8,7 @@ spring:
         hbm2ddl:
           auto: validate
   datasource:
-    url: jdbc:postgresql://192.168.31.17:5432/db
+    url: jdbc:postgresql://localhost:5432/db
     username: user
     password: password
     driver-class-name: org.postgresql.Driver

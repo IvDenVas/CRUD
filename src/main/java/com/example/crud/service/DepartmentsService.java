@@ -4,6 +4,6 @@ import com.example.crud.dto.DepartmentDto;
 
 public interface DepartmentsService {
     DepartmentDto getDepartmentById(Long id);
-    void save(DepartmentDto dto);
+    DepartmentDto save(DepartmentDto dto);
     void deleteDepartmentByID(Long id);
 }
