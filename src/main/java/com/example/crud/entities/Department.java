@@ -44,11 +44,4 @@ public class Department {
         if (!Objects.equals(creationDate, that.creationDate)) return false;
         return Objects.equals(modificationDate, that.modificationDate);
     }
-
-    public Department(String name, String address, LocalDateTime creationDate, LocalDateTime modificationDate) {
-        this.name = name;
-        this.address = address;
-        this.creationDate = creationDate;
-        this.modificationDate = modificationDate;
-    }
 }

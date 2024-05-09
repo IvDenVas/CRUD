@@ -2,150 +2,126 @@ package com.example.crud.service.implement;
 
 import com.example.crud.dto.DepartmentDto;
 import com.example.crud.entities.Department;
-import com.example.crud.utils.HibernateSessionFactoryUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import com.example.crud.repository.DepartmentRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
 import java.time.LocalDateTime;
-
+import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class DepartmentsServiceImplementUnitTest {
-
-    @Mock
     private ModelMapper mapper;
-
-    @Mock
-    private HibernateSessionFactoryUtil hibernateSessionFactoryUtil;
-
-    @Mock
-    private Session session;
-
-    @Mock
-    private Transaction transaction;
-    @InjectMocks
-    private DepartmentsServiceImplement departmentsService = new DepartmentsServiceImplement(mapper, hibernateSessionFactoryUtil);
-
-    private Department department;
-    private Department department1;
-    private DepartmentDto departmentDto;
-    private DepartmentDto departmentDto1;
-
+    private DepartmentRepo repo;
+    private DepartmentsServiceImplement serviceImplement;
     @BeforeEach
-    public void setUp() {
-        department = new Department(1L, "name", "name",LocalDateTime.now(), LocalDateTime.now());
-        department1 = new Department("name", "name",LocalDateTime.now(), LocalDateTime.now());
-        departmentDto = mapper.map(department, DepartmentDto.class);
-        departmentDto1 = mapper.map(department1, DepartmentDto.class);
+    void setUp(){
+        mapper = new ModelMapper();
+        repo = mock(DepartmentRepo.class);
+        serviceImplement = new DepartmentsServiceImplement(mapper,repo);
     }
 
     @Test
-    @DisplayName("Тест получение departmentDto по существующему id")
+    @DisplayName("Тест на получение departmentDto по существующему id")
     void getDepartmentByExistIdTest() {
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(session.get(Department.class, department.getId())).thenReturn(department);
-        when(mapper.map(department, DepartmentDto.class)).thenReturn(departmentDto);
+        Department department = new Department();
+        department.setId(1L);
+        department.setName("Name");
+        department.setAddress("Address");
+        DepartmentDto departmentDto = mapper.map(department, DepartmentDto.class);
 
-        assertEquals(departmentDto, departmentsService.getDepartmentById(1L));
+        when(repo.findById(1L)).thenReturn(Optional.of(department));
+
+        assertEquals(departmentDto, serviceImplement.getDepartmentById(1L));
     }
 
     @Test
-    @DisplayName("Тест получение departmentDto по несуществующему id")
+    @DisplayName("Тест на получение departmentDto по несуществующему id")
     void getDepartmentByNotExistIdTest() {
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(session.get(Department.class, department.getId())).thenReturn(null);
 
-        assertThrows(RuntimeException.class, () -> departmentsService.getDepartmentById(2L));
+        when(repo.findById(1L)).thenReturn(null);
+
+        assertThrows(RuntimeException.class, () -> serviceImplement.getDepartmentById(1L));
     }
 
     @Test
-    @DisplayName("Тест сохранение departmentDto с отсутствующим в БД id")
+    @DisplayName("Тест на сохранение departmentDto с отсутствующим в БД id")
     void saveDepartmentIfNotExistIdTest(){
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(mapper.map(departmentDto1, Department.class)).thenReturn(department1);
-        when(session.beginTransaction()).thenReturn(transaction);
+        DepartmentDto dto = new DepartmentDto();
+        dto.setName("Name");
+        dto.setAddress("Address");
 
-        departmentsService.save(departmentDto1);
+        when(repo.save(any(Department.class))).thenAnswer(i -> {
+            Department department = new Department();
+            department.setId(1L);
+            department.setName("Name");
+            department.setAddress("Address");
+            return department;
+        });
 
-        verify(session).persist(department1);
-        verify(transaction).commit();
+        DepartmentDto result = serviceImplement.save(dto);
+
+        assertEquals(1L, result.getId());
+        assertEquals("Name", result.getName());
+        assertEquals("Address", result.getAddress());
     }
 
     @Test
-    @DisplayName("Тест сохранение departmentDto с существующим в БД id")
-    void saveDepartmentIfExistIdTest(){
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(mapper.map(departmentDto, Department.class)).thenReturn(department);
-        when(session.beginTransaction()).thenReturn(transaction);
-
-        assertThrows(RuntimeException.class, () -> departmentsService.save(departmentDto));
-    }
-
-    @Test
-    @DisplayName("Тест изменения departmentDto с существующим в БД id")
+    @DisplayName("Тест на изменение departmentDto с существующим в БД id")
     void updateDepartmentByIdIfExistIdOrElseThrow(){
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(session.get(Department.class, 1L)).thenReturn(department);
-        when(session.beginTransaction()).thenReturn(transaction);
-        when(mapper.map(department, DepartmentDto.class)).thenReturn(departmentDto);
 
-        department.setName("New");
-        department.setAddress("New");
+        Department department = new Department();
+        department.setId(1L);
+        department.setName("Name");
+        department.setAddress("Address");
+        department.setCreationDate(LocalDateTime.now());
 
-        departmentsService.updateDepartmentByIdOrElseThrow(department);
+        when(repo.findById(1L)).thenReturn(Optional.of(department));
+        when(repo.save(department)).thenAnswer(i -> {
+            department.setName("NewName");
+            department.setAddress("NewAddress");
+            department.setModificationDate(LocalDateTime.now());
+            return department;
+        });
 
-        verify(session).evict(department);
-        verify(session).merge(department);
-        verify(transaction).commit();
+        DepartmentDto result = serviceImplement.updateDepartmentByIdOrElseThrow(department);
+
+        assertEquals(1L, result.getId());
+        assertEquals("NewName", result.getName());
+        assertEquals("NewAddress", result.getAddress());
+        assertNotNull(result.getModificationDate());
     }
 
     @Test
-    @DisplayName("Тест изменения departmentDto с отсутствующим в БД id")
+    @DisplayName("Тест на изменение departmentDto с отсутствующим в БД id")
     void updateDepartmentByIdIfNotExistIdOrElseThrow(){
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(session.get(Department.class, 111L)).thenReturn(department);
-        when(session.beginTransaction()).thenReturn(transaction);
-        when(mapper.map(department, DepartmentDto.class)).thenReturn(departmentDto);
+        Department department = new Department();
+        department.setId(1L);
 
-        department.setName("New");
-        department.setAddress("New");
+        when(repo.existsById(1L)).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> departmentsService.updateDepartmentByIdOrElseThrow(department));
+        assertThrows(RuntimeException.class, () -> serviceImplement.updateDepartmentByIdOrElseThrow(department));
     }
 
     @Test
-    @DisplayName("Тест удаления department с существующим в БД id")
+    @DisplayName("Тест на удаление department с существующим в БД id")
     void deleteDepartmentByIdIfExist(){
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(session.get(Department.class, 1L)).thenReturn(department);
-        when(session.beginTransaction()).thenReturn(transaction);
 
-        departmentsService.deleteDepartmentByID(1L);
+        when(repo.existsById(1L)).thenReturn(true);
 
-        verify(session).remove(department);
-        verify(transaction).commit();
+        serviceImplement.deleteDepartmentByID(1L);
+
+        verify(repo).deleteById(1L);
     }
 
     @Test
-    @DisplayName("Тест удаления department с отсутствующим в БД id")
+    @DisplayName("Тест на удаление department с отсутствующим в БД id")
     void deleteDepartmentByIdIfNotExist(){
-        when(hibernateSessionFactoryUtil.getSession()).thenReturn(session);
-        when(session.get(Department.class, 1L)).thenReturn(department);
-        when(session.beginTransaction()).thenReturn(transaction);
 
-        assertThrows(RuntimeException.class, () -> departmentsService.deleteDepartmentByID(101L));
+        when(repo.existsById(1L)).thenReturn(false);
+
+        assertThrows(RuntimeException.class, () -> serviceImplement.deleteDepartmentByID(1L));
     }
-
-
-
 }
