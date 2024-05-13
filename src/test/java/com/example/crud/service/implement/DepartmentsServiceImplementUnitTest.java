@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,39 +71,47 @@ class DepartmentsServiceImplementUnitTest {
 
     @Test
     @DisplayName("Тест на изменение departmentDto с существующим в БД id")
-    void updateDepartmentByIdIfExistIdOrElseThrow(){
+    void saveDepartmentIfExistIdTest(){
+        LocalDateTime createDateTime = LocalDateTime.now();
 
         Department department = new Department();
         department.setId(1L);
         department.setName("Name");
         department.setAddress("Address");
-        department.setCreationDate(LocalDateTime.now());
+        department.setCreationDate(createDateTime);
+        department.setModificationDate(null);
+
+        DepartmentDto updateDto = new DepartmentDto();
+        updateDto.setId(1L);
+        updateDto.setName("NewName");
+        updateDto.setAddress("NewAddress");
 
         when(repo.findById(1L)).thenReturn(Optional.of(department));
-        when(repo.save(department)).thenAnswer(i -> {
-            department.setName("NewName");
-            department.setAddress("NewAddress");
+        when(repo.save(any())).thenAnswer(i -> {
+            department.setName(updateDto.getName());
+            department.setAddress(updateDto.getAddress());
             department.setModificationDate(LocalDateTime.now());
             return department;
         });
 
-        DepartmentDto result = serviceImplement.updateDepartmentByIdOrElseThrow(department);
+        DepartmentDto updatedAndSavedDepartment = serviceImplement.save(updateDto);
 
-        assertEquals(1L, result.getId());
-        assertEquals("NewName", result.getName());
-        assertEquals("NewAddress", result.getAddress());
-        assertNotNull(result.getModificationDate());
+        assertEquals(1L, updatedAndSavedDepartment.getId());
+        assertEquals("NewName", updatedAndSavedDepartment.getName());
+        assertEquals("NewAddress", updatedAndSavedDepartment.getAddress());
+        assertEquals(createDateTime.toString(), updatedAndSavedDepartment.getCreationDate());
+        assertNotNull(updatedAndSavedDepartment.getModificationDate());
     }
 
     @Test
-    @DisplayName("Тест на изменение departmentDto с отсутствующим в БД id")
-    void updateDepartmentByIdIfNotExistIdOrElseThrow(){
-        Department department = new Department();
-        department.setId(1L);
+    @DisplayName("Тест на изменение departmentDto с несуществующим в БД id")
+    void saveDepartmentIfNotExistIdGetThrowTest(){
+        DepartmentDto updateDepartment = new DepartmentDto();
+        updateDepartment.setId(12L);
 
-        when(repo.existsById(1L)).thenReturn(false);
+        when(repo.existsById(12L)).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> serviceImplement.updateDepartmentByIdOrElseThrow(department));
+        assertThrows(RuntimeException.class, () -> serviceImplement.save(updateDepartment));
     }
 
     @Test
