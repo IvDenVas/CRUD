@@ -1,12 +1,20 @@
 package com.example.crud.controllers;
 
 import com.example.crud.dto.DepartmentDto;
+import com.example.crud.dto.EmployeeDto;
 import com.example.crud.exception.ErrorMessage;
 import com.example.crud.service.implement.DepartmentsServiceImplement;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 /**
  * Класс REST контроллер.
  */
@@ -23,7 +31,7 @@ public class DepartmentsController {
      * @return ResponseEntity содержит DTO департамента и HTTP статус.
      */
     @GetMapping("get/{id}")
-    public ResponseEntity<DepartmentDto> findDepartmentById(@PathVariable Long id){
+    public ResponseEntity<DepartmentDto> findDepartmentById(@PathVariable Long id) {
         return new ResponseEntity<>(departmentsServiceImplement.getDepartmentById(id), HttpStatus.OK);
     }
 
@@ -33,8 +41,8 @@ public class DepartmentsController {
      * @param dto DTO департамента для его обновления.
      * @return ResponseEntity содержит DTO департамента и HTTP статус.
      */
-    @PostMapping("save/")
-    public ResponseEntity<DepartmentDto> addOrUpdateDepartment(DepartmentDto dto){
+    @PostMapping( "save/")
+    public ResponseEntity<DepartmentDto> addOrUpdateDepartment(@RequestBody DepartmentDto dto) {
         return new ResponseEntity<>(departmentsServiceImplement.save(dto), HttpStatus.OK);
     }
 
@@ -45,7 +53,7 @@ public class DepartmentsController {
      * @return ResponseEntity содержит HTTP статус.
      */
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> deleteDepartment(@PathVariable Long id){
+    public ResponseEntity<String> deleteDepartment(@PathVariable Long id) {
         departmentsServiceImplement.deleteDepartmentByID(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

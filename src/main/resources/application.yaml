@@ -7,6 +7,8 @@ spring:
       hibernate:
         hbm2ddl:
           auto: validate
+        format_sql: true
+    show-sql: true
   datasource:
     url: jdbc:postgresql://localhost:5432/db
     username: user

@@ -1,11 +1,10 @@
 package com.example.crud.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * Класс сущности - Департамент.
  */
@@ -13,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@ToString(exclude = "employee")
 @Table(name = "department")
 public class Department {
     @Id
@@ -25,9 +25,12 @@ public class Department {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false, name = "creation_date")
+    @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
-    @Column(nullable = true, name = "modification_date")
+    @Column(name = "modification_date")
     private LocalDateTime modificationDate;
+
+    @OneToMany(mappedBy="department", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Employee> employees;
 }

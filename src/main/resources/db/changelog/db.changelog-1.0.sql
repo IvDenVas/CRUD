@@ -8,3 +8,11 @@ CREATE TABLE IF NOT EXISTS department(
     modification_date TIMESTAMP
 );
 --rollback DROP TABLE department;
+CREATE TABLE IF NOT EXISTS employee(
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    surname VARCHAR(50) NOT NULL,
+    department_id BIGINT NOT NULL,
+    FOREIGN KEY (department_id) REFERENCES department(id)
+);
+--rollback DROP TABLE employee;
