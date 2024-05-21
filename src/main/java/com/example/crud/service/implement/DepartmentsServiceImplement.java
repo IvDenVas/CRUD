@@ -120,22 +120,20 @@ public class DepartmentsServiceImplement implements DepartmentsService {
      * @return DepartmentDto dto департамента.
      */
     private DepartmentDto createIfExistEmployeeDto(Department department, List<EmployeeDto> employeesDtoList) {
-        Department newDepartment = new Department();
-
         List<Employee> employeeList = employeesDtoList.stream()
                 .map((element) -> mapper.map(element, Employee.class))
                 .toList();
 
-        employeeList.forEach(employee -> employee.setDepartment(newDepartment));
+        employeeList.forEach(employee -> employee.setDepartment(department));
 
-        newDepartment.setEmployees(employeeList);
-        newDepartment.setName(department.getName());
-        newDepartment.setAddress(department.getAddress());
-        newDepartment.setCreationDate(LocalDateTime.now());
-        newDepartment.setModificationDate(null);
-        newDepartment.setEmployees(employeeList);
+        department.setEmployees(employeeList);
+        department.setName(department.getName());
+        department.setAddress(department.getAddress());
+        department.setCreationDate(LocalDateTime.now());
+        department.setModificationDate(null);
+        department.setEmployees(employeeList);
 
-        Department savedDepartment = departmentRepo.save(newDepartment);
+        Department savedDepartment = departmentRepo.save(department);
         List<EmployeeDto> employeeDtoList = savedDepartment.getEmployees()
                 .stream()
                 .map(element -> mapper.map(element, EmployeeDto.class))
