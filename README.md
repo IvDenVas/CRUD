@@ -1,3 +1,5 @@
+Swagger: http://localhost:8080/swagger-ui/index.html#/departments-controller/findDepartmentById
+
 Реализовать классическое приложение CRUD на технологиях Java 17\SpringBoot\Hibernate, в качестве БД надо использовать postgres
 
 1) Приложение работает с таблицей department, у которой поля id(число), name(строка), address(строка), creation_date(дата со временем), modification_date(дата со временем).

@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,7 +52,7 @@ public class DepartmentsServiceImplement implements DepartmentsService {
         if (Objects.isNull(dto.getId())) {
             return createDepartment(dto);
         } else {
-            return updateDepartmentByIdOrElseThrow(dto);
+            return updateDepartment(dto);
         }
     }
 
@@ -73,19 +74,47 @@ public class DepartmentsServiceImplement implements DepartmentsService {
      * @return DepartmentDto dto департамента.
      * @throws RuntimeException при отсутствии в БД id.
      */
-    private DepartmentDto updateDepartmentByIdOrElseThrow(DepartmentDto dto) {
+
+    private DepartmentDto updateDepartment(DepartmentDto dto) {
         Long id = dto.getId();
         if (departmentRepo.existsById(id)) {
-            Department updateDepartment = departmentRepo.findById(id).orElse(null);
-            updateDepartment.setName(dto.getName());
-            updateDepartment.setAddress(dto.getAddress());
-            updateDepartment.setModificationDate(LocalDateTime.now());
-            return mapper.map(departmentRepo.save(updateDepartment), DepartmentDto.class);
-        } else
+            Department updatedDepartment = departmentRepo.findById(dto.getId()).orElse(null);
+
+            Department departmentTemp = new Department();
+            if (Objects.isNull(dto.getEmployeeDtoList())) {
+                departmentTemp.setEmployees(new ArrayList<>());
+            } else {
+                List<EmployeeDto> employeeDtoListInput = dto.getEmployeeDtoList();
+                List<Employee> employeeList = employeeDtoListInput.stream()
+                        .map((element) -> mapper.map(element, Employee.class))
+                        .toList();
+
+                employeeList.forEach(employee -> employee.setDepartment(departmentTemp));
+                departmentTemp.setEmployees(employeeList);
+            }
+
+            departmentTemp.setId(updatedDepartment.getId());
+            departmentTemp.setName(dto.getName());
+            departmentTemp.setAddress(dto.getAddress());
+            departmentTemp.setCreationDate(updatedDepartment.getCreationDate());
+            departmentTemp.setModificationDate(LocalDateTime.now());
+
+            Department savedDepartment = departmentRepo.save(departmentTemp);
+
+            List<EmployeeDto> employeeDtoListOutput = savedDepartment.getEmployees()
+                    .stream()
+                    .map(element -> mapper.map(element, EmployeeDto.class))
+                    .toList();
+            DepartmentDto savedDepartmentDto = mapper.map(savedDepartment, DepartmentDto.class);
+            savedDepartmentDto.setEmployeeDtoList(employeeDtoListOutput);
+            return savedDepartmentDto;
+        } else {
             throw new RuntimeException("Department с таким ID нет в базе данных! Введите правильный id!");
+        }
     }
+
     /**
-     * Метод выбора способа сохранения.
+     * Метод создания департамента.
      *
      * @param dto департамент.
      * @return DepartmentDto департамент.
@@ -93,53 +122,29 @@ public class DepartmentsServiceImplement implements DepartmentsService {
     private DepartmentDto createDepartment(DepartmentDto dto) {
         Department department = mapper.map(dto, Department.class);
         List<EmployeeDto> employeesDtoList = dto.getEmployeeDtoList();
-        if(Objects.isNull(employeesDtoList)) {
-            return createIfNotExistEmployeeDto(department);
+        if (Objects.isNull(employeesDtoList)) {
+            department.setEmployees(new ArrayList<>());
         } else {
-            return createIfExistEmployeeDto(department, employeesDtoList);
+            List<Employee> employeeList = employeesDtoList.stream()
+                    .map((element) -> mapper.map(element, Employee.class))
+                    .toList();
+
+            employeeList.forEach(employee -> employee.setDepartment(department));
+            department.setEmployees(employeeList);
         }
-    }
-    /**
-     * Метод сохранения нового департамента без сотрудников.
-     *
-     * @param department департамент.
-     * @return DepartmentDto dto департамента.
-     */
-    private DepartmentDto createIfNotExistEmployeeDto(Department department) {
-        department.setCreationDate(LocalDateTime.now());
-        department.setModificationDate(null);
-        department.setEmployees(null);
-        Department savedDepartment = departmentRepo.save(department);
-        return mapper.map(savedDepartment, DepartmentDto.class);
-    }
-    /**
-     * Метод сохранения нового департамента со списком сотрудников.
-     *
-     * @param department департамент.
-     * @param employeesDtoList список сотрдуников
-     * @return DepartmentDto dto департамента.
-     */
-    private DepartmentDto createIfExistEmployeeDto(Department department, List<EmployeeDto> employeesDtoList) {
-        List<Employee> employeeList = employeesDtoList.stream()
-                .map((element) -> mapper.map(element, Employee.class))
-                .toList();
-
-        employeeList.forEach(employee -> employee.setDepartment(department));
-
-        department.setEmployees(employeeList);
         department.setName(department.getName());
         department.setAddress(department.getAddress());
         department.setCreationDate(LocalDateTime.now());
         department.setModificationDate(null);
-        department.setEmployees(employeeList);
 
         Department savedDepartment = departmentRepo.save(department);
-        List<EmployeeDto> employeeDtoList = savedDepartment.getEmployees()
+
+        List<EmployeeDto> employeeDtoListOut = savedDepartment.getEmployees()
                 .stream()
                 .map(element -> mapper.map(element, EmployeeDto.class))
                 .toList();
         DepartmentDto savedDepartmentDto = mapper.map(savedDepartment, DepartmentDto.class);
-        savedDepartmentDto.setEmployeeDtoList(employeeDtoList);
+        savedDepartmentDto.setEmployeeDtoList(employeeDtoListOut);
         return savedDepartmentDto;
     }
 }

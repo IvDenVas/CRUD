@@ -1,8 +1,6 @@
 package com.example.crud.dto;
 
-import com.example.crud.entities.Employee;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

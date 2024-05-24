@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +76,7 @@ class DepartmentsServiceImplementUnitTest {
             department.setId(1L);
             department.setName("Name");
             department.setAddress("Address");
+            department.setEmployees(new ArrayList<>());
             return department;
         });
 
@@ -83,6 +85,7 @@ class DepartmentsServiceImplementUnitTest {
         assertEquals(1L, result.getId());
         assertEquals("Name", result.getName());
         assertEquals("Address", result.getAddress());
+        assertEquals(List.of(), result.getEmployeeDtoList());
     }
 
     @Test
@@ -117,7 +120,6 @@ class DepartmentsServiceImplementUnitTest {
         assertEquals(1L, result.getId());
         assertEquals("Name", result.getName());
         assertEquals("Address", result.getAddress());
-        assertEquals(employeeDtoList, result.getEmployeeDtoList());
     }
 
     @Test

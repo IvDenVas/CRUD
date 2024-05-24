@@ -67,6 +67,7 @@ public class DepartmentsServiceImplementIntegrationTest {
         assertEquals(dto.getName(), result.getName());
         assertEquals(dto.getAddress(), result.getAddress());
         assertNotNull(result.getCreationDate());
+        assertEquals(List.of(), result.getEmployeeDtoList());
     }
 
     @Test
