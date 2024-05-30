@@ -21,16 +21,44 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(ContainerPostgres.class)
 public class DepartmentsServiceImplementIntegrationTest {
 
-
     @Autowired
     private DepartmentsServiceImplement departmentsService;
+
+    private DepartmentDto getDepartmentDto(String name, String address) {
+        DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setName(name);
+        departmentDto.setAddress(address);
+        return departmentDto;
+    }
+
+    private DepartmentDto getDepartmentDto(Long id, String name, String address) {
+        DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setId(id);
+        departmentDto.setName(name);
+        departmentDto.setAddress(address);
+        return departmentDto;
+    }
+
+    private EmployeeDto getEmployeeDto(String name, String surname) {
+        EmployeeDto employeeDto = new EmployeeDto();
+        employeeDto.setName(name);
+        employeeDto.setSurname(surname);
+        return employeeDto;
+    }
+
+    private EmployeeDto getEmployeeDto(Long id, String name, String surname) {
+        EmployeeDto employeeDto = new EmployeeDto();
+        employeeDto.setId(id);
+        employeeDto.setName(name);
+        employeeDto.setSurname(surname);
+        return employeeDto;
+    }
+
 
     @Test
     @DisplayName("Тест на получение Department по существующему ID")
     void getDepartmentIfExistIdTest() {
-        DepartmentDto dto = new DepartmentDto();
-        dto.setName("Test1");
-        dto.setAddress("Test1");
+        DepartmentDto dto = getDepartmentDto("Test1", "Test1");
 
         List<EmployeeDto> employeeDtoList = Arrays.asList(
                 new EmployeeDto(1L,"EmpTest1", "SurTest1"),
@@ -56,9 +84,7 @@ public class DepartmentsServiceImplementIntegrationTest {
     @DisplayName("Тест на сохранение Department без списка сотрудников с отсутствующим в БД id")
     void saveDepartmentWithoutListEmployeeIfNotExistIdTest() {
 
-        DepartmentDto dto = new DepartmentDto();
-        dto.setName("Test4");
-        dto.setAddress("Test4");
+        DepartmentDto dto = getDepartmentDto("Test4", "Test4");
 
         departmentsService.save(dto);
         DepartmentDto result = departmentsService.getDepartmentById(4L);
@@ -74,21 +100,11 @@ public class DepartmentsServiceImplementIntegrationTest {
     @DisplayName("Тест на сохранение Department со списком сотрудников с отсутствующим в БД id")
     void saveDepartmentWithListEmployeeIfNotExistIdTest() {
 
-        DepartmentDto dto = new DepartmentDto();
-        dto.setName("Test5");
-        dto.setAddress("Test5");
-
-        EmployeeDto employeeDtoOne = new EmployeeDto();
-        employeeDtoOne.setName("EmpTest7");
-        employeeDtoOne.setSurname("SurTest7");
-
-        EmployeeDto employeeDtoTwo = new EmployeeDto();
-        employeeDtoTwo.setName("EmpTest8");
-        employeeDtoTwo.setSurname("SurTest8");
+        DepartmentDto dto = getDepartmentDto("Test5", "Test5");
 
         List<EmployeeDto> employeeDtoList = new ArrayList<>();
-        employeeDtoList.add(employeeDtoOne);
-        employeeDtoList.add(employeeDtoTwo);
+        employeeDtoList.add(getEmployeeDto("EmpTest7", "SurTest7"));
+        employeeDtoList.add(getEmployeeDto("EmpTest8", "SurTest8"));
 
         dto.setEmployeeDtoList(employeeDtoList);
 
@@ -101,16 +117,37 @@ public class DepartmentsServiceImplementIntegrationTest {
         assertNotNull(result.getCreationDate());
         assertNotNull(result.getEmployeeDtoList());
         assertEquals(2, result.getEmployeeDtoList().size());
+        assertNotNull(result.getEmployeeDtoList().get(0).getId());
+        assertEquals("EmpTest7", result.getEmployeeDtoList().get(0).getName());
+        assertEquals("SurTest7", result.getEmployeeDtoList().get(0).getSurname());
+        assertNotNull(result.getEmployeeDtoList().get(1).getId());
+        assertEquals("EmpTest8", result.getEmployeeDtoList().get(1).getName());
+        assertEquals("SurTest8", result.getEmployeeDtoList().get(1).getSurname());
     }
 
+    @Test
+    @DisplayName("Тест на изменение departmentDto без списка с существующим в БД id")
+    void saveDepartmentWithoutListIfExistIdTest() {
+        DepartmentDto updateDto = getDepartmentDto(2L,"NewTest2", "NewTest2");
+
+        DepartmentDto updatedAndSavedDepartment = departmentsService.save(updateDto);
+
+        assertEquals(2L, updatedAndSavedDepartment.getId());
+        assertEquals("NewTest2", updatedAndSavedDepartment.getName());
+        assertEquals("NewTest2", updatedAndSavedDepartment.getAddress());
+        assertNotNull(updatedAndSavedDepartment.getModificationDate());
+    }
 
     @Test
-    @DisplayName("Тест на изменение departmentDto с существующим в БД id")
-    void saveDepartmentIfExistIdTest() {
-        DepartmentDto updateDto = new DepartmentDto();
-        updateDto.setId(1L);
-        updateDto.setName("NewTest1");
-        updateDto.setAddress("NewTest1");
+    @DisplayName("Тест на изменение departmentDto со списком и существующим в БД id")
+    void saveDepartmentWithListIfExistIdTest() {
+        DepartmentDto updateDto = getDepartmentDto(1L,"NewTest1", "NewTest1");
+
+        List<EmployeeDto> employeeDtoList = new ArrayList<>();
+        employeeDtoList.add(getEmployeeDto(7L, "NewEmpTest7", "NewSurTest7"));
+        employeeDtoList.add(getEmployeeDto(8L, "NewEmpTest8", "NewSurTest8"));
+
+        updateDto.setEmployeeDtoList(employeeDtoList);
 
         DepartmentDto updatedAndSavedDepartment = departmentsService.save(updateDto);
 
@@ -118,6 +155,12 @@ public class DepartmentsServiceImplementIntegrationTest {
         assertEquals("NewTest1", updatedAndSavedDepartment.getName());
         assertEquals("NewTest1", updatedAndSavedDepartment.getAddress());
         assertNotNull(updatedAndSavedDepartment.getModificationDate());
+        assertEquals(7L, updatedAndSavedDepartment.getEmployeeDtoList().get(0).getId());
+        assertEquals("NewEmpTest7", updatedAndSavedDepartment.getEmployeeDtoList().get(0).getName());
+        assertEquals("NewSurTest7", updatedAndSavedDepartment.getEmployeeDtoList().get(0).getSurname());
+        assertEquals(8L, updatedAndSavedDepartment.getEmployeeDtoList().get(1).getId());
+        assertEquals("NewEmpTest8", updatedAndSavedDepartment.getEmployeeDtoList().get(1).getName());
+        assertEquals("NewSurTest8", updatedAndSavedDepartment.getEmployeeDtoList().get(1).getSurname());
     }
 
     @Test

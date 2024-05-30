@@ -93,21 +93,13 @@ public class DepartmentsServiceImplement implements DepartmentsService {
                 departmentTemp.setEmployees(employeeList);
             }
 
-            departmentTemp.setId(updatedDepartment.getId());
+            departmentTemp.setId(Objects.requireNonNull(updatedDepartment).getId());
             departmentTemp.setName(dto.getName());
             departmentTemp.setAddress(dto.getAddress());
             departmentTemp.setCreationDate(updatedDepartment.getCreationDate());
             departmentTemp.setModificationDate(LocalDateTime.now());
 
-            Department savedDepartment = departmentRepo.save(departmentTemp);
-
-            List<EmployeeDto> employeeDtoListOutput = savedDepartment.getEmployees()
-                    .stream()
-                    .map(element -> mapper.map(element, EmployeeDto.class))
-                    .toList();
-            DepartmentDto savedDepartmentDto = mapper.map(savedDepartment, DepartmentDto.class);
-            savedDepartmentDto.setEmployeeDtoList(employeeDtoListOutput);
-            return savedDepartmentDto;
+            return departmentDtoToReturn(departmentTemp);
         } else {
             throw new RuntimeException("Department с таким ID нет в базе данных! Введите правильный id!");
         }
@@ -137,6 +129,16 @@ public class DepartmentsServiceImplement implements DepartmentsService {
         department.setCreationDate(LocalDateTime.now());
         department.setModificationDate(null);
 
+        return departmentDtoToReturn(department);
+    }
+
+    /**
+     * Метод возвращает departmentDto со списком сотрудников сохраненного департамента.
+     *
+     * @param department департамент.
+     * @return DepartmentDto департамент.
+     */
+    private DepartmentDto departmentDtoToReturn(Department department) {
         Department savedDepartment = departmentRepo.save(department);
 
         List<EmployeeDto> employeeDtoListOut = savedDepartment.getEmployees()
